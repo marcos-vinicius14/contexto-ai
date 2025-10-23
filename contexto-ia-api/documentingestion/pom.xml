@@ -11,18 +11,35 @@
 
     <artifactId>documentingestion</artifactId>
     <name>documentingestion</name>
-    <description>Document ingestion module</description>
+    <description>Módulo de ingestão e processamento de documentos</description>
 
     <dependencies>
         <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-starter-vector-store-pgvector</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId> <!-- Para RabbitMQ -->
         </dependency>
+
         <dependency>
             <groupId>marcos-vinicius14</groupId>
             <artifactId>common</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
+
+
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-vertex-ai-gemini-spring-boot-starter</artifactId>
+            <version>0.33.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.awspring.cloud</groupId>
+            <artifactId>spring-cloud-aws-starter</artifactId>
+            <version>3.4.0</version>
+        </dependency>
+
+
     </dependencies>
 
 </project>
+
