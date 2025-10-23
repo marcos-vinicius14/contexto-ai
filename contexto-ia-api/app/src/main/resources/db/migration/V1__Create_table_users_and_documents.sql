@@ -7,7 +7,6 @@ CREATE TABLE tb_users (
     updated_at TIMESTAMP WITH TIME ZONE
 );
 
--- Sugestão de correção
 CREATE TABLE tb_documents(
     id UUID PRIMARY KEY,
     file_name VARCHAR(400) NOT NULL,
