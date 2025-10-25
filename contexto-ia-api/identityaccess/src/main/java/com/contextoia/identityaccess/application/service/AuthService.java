@@ -1,7 +1,10 @@
 package com.contextoia.identityaccess.application.service;
 
 import com.contextoia.identityaccess.application.dto.AuthDTO;
+import com.contextoia.identityaccess.application.dto.RegisterDTO;
+import com.contextoia.identityaccess.domain.model.User;
 import com.contextoia.identityaccess.domain.repository.UserRepository;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -29,14 +32,26 @@ public class AuthService {
     /**
      * Autentica um usuário e, se bem-sucedido, gera um token JWT.
      */
-    public String authenticateAndGetToken(AuthDTO request) {
+    public String authenticateAndGetToken(String username, String password) {
         Authentication authentication = authenticationManager
                 .authenticate(
-                new UsernamePasswordAuthenticationToken(request.username(), request.password())
+                new UsernamePasswordAuthenticationToken(username, password)
         );
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         return  jwtService.generateToken(userDetails);
+    }
+
+    public User register(String username, String email, String rawPassword) {
+        User newUser = User.create(
+                username,
+                email,
+                rawPassword,
+                passwordEncoder
+        );
+
+        return userRepository.save(newUser);
+
     }
 
 
