@@ -1,0 +1,1 @@
+ALTER TABLE tb_users ADD COLUMN locked BOOLEAN NOT NULL DEFAULT false;
