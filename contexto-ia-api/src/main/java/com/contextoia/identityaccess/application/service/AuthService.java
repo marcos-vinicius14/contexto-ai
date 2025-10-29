@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.contextoia.common.exceptions.InvalidDataException;
 import com.contextoia.identityaccess.api.dto.UserDTO;
 import com.contextoia.identityaccess.application.dto.CreateUserDTO;
 import com.contextoia.identityaccess.domain.model.User;
@@ -19,13 +20,15 @@ public class AuthService {
     private final JwtService jwtService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
     public AuthService(AuthenticationManager authenticationManager,
-            JwtService jwtService, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+            JwtService jwtService, UserRepository userRepository, PasswordEncoder passwordEncoder, UserMapper userMapper) {
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userMapper = userMapper;
     }
 
     /**
@@ -42,11 +45,11 @@ public class AuthService {
 
     public UserDTO register(CreateUserDTO request) {
         if (userRepository.findByUsername(request.username()).isPresent()) {
-            throw new IllegalArgumentException("Username '" + request.username() + "' already exists.");
+            throw new InvalidDataException("Username '" + request.username() + "' already exists.");
         }
 
         if (userRepository.findByEmail(request.email()).isPresent()) {
-            throw new IllegalArgumentException("Email" + request.email() + "' already registered.");
+            throw new InvalidDataException("Email" + request.email() + "' already registered.");
         }
 
         User newUser = User.create(
@@ -56,7 +59,7 @@ public class AuthService {
                 passwordEncoder);
 
         userRepository.save(newUser);
-        UserDTO userCreated = UserMapper.INSTANCE.userToUserDto(newUser);
+        UserDTO userCreated = userMapper.userToUserDto(newUser);
 
         return userCreated;
 
