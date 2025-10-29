@@ -1,0 +1,37 @@
+# Exclui arquivos de build do Maven
+### Maven ###
+target/
+
+# Exclui arquivos de build do Gradle
+### Gradle ###
+build/
+
+# Exclui o wrapper do Gradle, que não é necessário dentro do contêiner
+### Gradle ###
+gradle/
+.gradle/
+
+# Exclui o cache do Maven
+### Maven ###
+.m2/
+
+# Exclui arquivos de controle de versão
+.git
+.gitignore
+
+# Exclui arquivos de configuração do IDE
+.idea/
+.vscode/
+*.iml
+
+# Exclui arquivos de log
+*.log
+logs/
+
+# Exclui o arquivo Dockerfile e o docker-compose.yml
+# Já que eles não precisam estar dentro da imagem que está sendo construída
+Dockerfile
+docker-compose.yml
+
+# Exclui o diretório e arquivos do Docker Desktop
+.docker/
