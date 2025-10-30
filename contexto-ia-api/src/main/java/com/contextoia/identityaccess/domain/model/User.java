@@ -51,6 +51,14 @@ public class User {
 
     protected User() {}
 
+    private User(UUID id, String username, String email) {
+        validateEmail(email);
+        validateUsername(username);
+        this.id = id;
+        this.username = username;
+        this.email = email;
+    }
+
     private User(String username, String email, String rawPassword, PasswordEncoder passwordEncoder) {
         validateUsername(username);
         validateEmail(email);
@@ -66,6 +74,12 @@ public class User {
     public static User create(String username, String email, String rawPassword, PasswordEncoder passwordEncoder) {
         return new User(username, email, rawPassword, passwordEncoder);
     }
+
+    public  static User createMinimal(UUID id, String username, String email) {
+        return  new User(id, username, email);
+    }
+
+
 
     public void changePassword(String newRawPassword, PasswordEncoder passwordEncoder) {
         Assert.hasText(newRawPassword, "New password cannot be empty");
