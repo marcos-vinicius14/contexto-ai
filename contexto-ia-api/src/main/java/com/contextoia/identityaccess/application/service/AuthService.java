@@ -1,8 +1,6 @@
 package com.contextoia.identityaccess.application.service;
 
-import com.contextoia.common.exceptions.AccountDisabledException;
 import jakarta.transaction.Transactional;
-import org.apache.http.auth.InvalidCredentialsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.*;
@@ -18,7 +16,6 @@ import com.contextoia.identityaccess.domain.model.User;
 import com.contextoia.identityaccess.domain.repository.UserRepository;
 import com.contextoia.identityaccess.mapper.UserMapper;
 
-import javax.security.auth.login.AccountLockedException;
 
 
 @Service
@@ -69,6 +66,13 @@ public class AuthService {
         }
     }
 
+    /**
+     * Registers a new user based on the provided registration details.
+     *
+     * @param request the details required to create a new user, including email, username, and raw password
+     * @return a DTO representing the newly created user, including their ID, username, and email
+     * @throws InvalidDataException if the username or email already exists
+     */
     @Transactional
     public UserDTO register(CreateUserDTO request) {
         validateUsernameNotExists(request.username());
@@ -86,6 +90,13 @@ public class AuthService {
         return userMapper.toDto(savedUser);
     }
 
+    /**
+     * Validates that the given username does not already exist in the system.
+     * If the username exists, an {@code InvalidDataException} is thrown.
+     *
+     * @param username the username to validate
+     * @throws InvalidDataException if the username already exists
+     */
     private void validateUsernameNotExists(String username) {
         if (userRepository.existsByUsername(username)) {
             throw new InvalidDataException(
@@ -94,6 +105,13 @@ public class AuthService {
         }
     }
 
+    /**
+     * Validates that the given email does not already exist in the system.
+     * If the email exists, an {@code InvalidDataException} is thrown.
+     *
+     * @param email the email to validate
+     * @throws InvalidDataException if the email already exists
+     */
     private void validateEmailNotExists(String email) {
         if (userRepository.existsByEmail(email)) {
             throw new InvalidDataException(
@@ -102,6 +120,14 @@ public class AuthService {
         }
     }
 
+    /**
+     * Validates that the provided username and password are not null or blank.
+     * If either the username or password is invalid, an {@code InvalidDataException} will be thrown.
+     *
+     * @param username the username to validate
+     * @param password the password to validate
+     * @throws InvalidDataException if the username or password is null or blank
+     */
     private void validateCredentials(String username, String password) {
         if (username == null || username.isBlank()) {
             throw  new InvalidDataException("Nome de usuário ou senha não pode ser nulo");
