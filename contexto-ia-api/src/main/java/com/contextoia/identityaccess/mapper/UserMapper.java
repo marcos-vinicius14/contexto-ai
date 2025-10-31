@@ -1,17 +1,35 @@
 package com.contextoia.identityaccess.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 
 import com.contextoia.identityaccess.api.dto.UserDTO;
 import com.contextoia.identityaccess.domain.model.User;
+import org.springframework.stereotype.Component;
 
-@Mapper
-public interface UserMapper {
-    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
-    UserDTO userToUserDto(User user);
+@Component
+public class UserMapper {
+    private static final DateTimeFormatter DATE_FORMATTER =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-    User userDtoToUser(UserDTO userDTO);
+    public UserDTO toDto(User user) {
+
+        return new UserDTO(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail()
+        );
+    }
+
+    public static Optional<User> toEntity(UserDTO dto) {
+        if (dto == null) {
+            return Optional.empty();
+        }
+
+        User user = User.createMinimal(dto.id(), dto.username(), dto.email());
+
+        return Optional.of(user);
+    }
 
 }
