@@ -25,3 +25,4 @@ CREATE TABLE tb_chat_history(
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES tb_users(id)
 );
+

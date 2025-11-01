@@ -2,6 +2,7 @@ package com.contextoia.identityaccess.domain.model;
 
 import com.contextoia.common.exceptions.InvalidDataException;
 import jakarta.persistence.*;
+import org.hibernate.annotations.UuidGenerator;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.Assert;
 
@@ -13,7 +14,8 @@ import java.util.UUID;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
     private UUID id;
 
     @Column(name = "username", unique = true, nullable = false, length = 50)
