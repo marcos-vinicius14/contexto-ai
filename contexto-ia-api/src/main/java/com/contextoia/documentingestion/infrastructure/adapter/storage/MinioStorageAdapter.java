@@ -47,13 +47,22 @@ public class MinioStorageAdapter implements StoragePort {
 
     @Override
     public String store(MultipartFile file, String fileName) throws IOException {
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("O arquivo não pode estar vazio");
+        }
+
         try {
+            String contentType = file.getContentType();
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            }
+            
             minioClient.putObject(
                     PutObjectArgs.builder()
                             .bucket(bucketName)
                             .object(fileName)
                             .stream(file.getInputStream(), file.getSize(), -1)
-                            .contentType(file.getContentType())
+                            .contentType(contentType)
                             .build()
             );
             return fileName;
