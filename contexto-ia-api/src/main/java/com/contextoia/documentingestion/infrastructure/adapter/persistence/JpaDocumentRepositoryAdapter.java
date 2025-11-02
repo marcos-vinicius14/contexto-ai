@@ -9,6 +9,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Adapter class that implements the {@link DocumentRepositoryPort} interface,
+ * providing an integration layer between the domain model and the JPA persistence mechanism.
+ * It delegates the operations to the {@link JpaDocumentRepository}.
+ *
+ * This class is marked as a Spring {@code @Repository}, making it a component
+ * responsible for data access and enabling dependency injection.
+ */
 @Repository
 public class JpaDocumentRepositoryAdapter implements DocumentRepositoryPort {
 
