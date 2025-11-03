@@ -1,7 +1,12 @@
-server: 8080
 spring:
+  # ============================================
+  # DATABASE (PostgreSQL + HikariCP)
+  # ============================================
   datasource:
     driver-class-name: org.postgresql.Driver
+    url: ${DATABASE_URL}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
     hikari:
       pool-name: contexto_pool
       maximum-pool-size: 4
@@ -10,21 +15,10 @@ spring:
       max-lifetime: 1800000
       connection-timeout: 30000
       leak-detection-threshold: 2000
-    url: ${DATABASE_URL}
-    password: ${POSTGRES_PASSWORD}
-    username: ${POSTGRES_USER}
 
-  flyway:
-    enabled: true
-    locations: classpath:db/migration
-    url: ${DATABASE_URL}
-    user: ${POSTGRES_USER}
-    password: ${POSTGRES_PASSWORD}
-    validate-on-migrate: true
-    out-of-order: false
-    connect-retries: 10
-    connect-retries-interval: 3
-
+  # ============================================
+  # JPA / HIBERNATE
+  # ============================================
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
@@ -41,6 +35,41 @@ spring:
       ddl-auto: none
     open-in-view: false
 
+  # ============================================
+  # FLYWAY
+  # ============================================
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    url: ${DATABASE_URL}
+    user: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    validate-on-migrate: true
+    out-of-order: false
+    connect-retries: 10
+    connect-retries-interval: 3
+
+  # ============================================
+  # FILE UPLOAD
+  # ============================================
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+  # ============================================
+  # RABBITMQ (Conexão do Spring)
+  # ============================================
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+
+  # ============================================
+  # MINIO (Configurado via Spring Cloud AWS S3)
+  # ============================================
   cloud:
     aws:
       region:
@@ -52,6 +81,9 @@ spring:
         access-key: ${MINIO_ACCESS_KEY}
         secret-key: ${MINIO_SECRET_KEY}
 
+# ============================================
+# LANGCHAIN4J (VertexAI + PGVector)
+# ============================================
 langchain4j:
   vertexai:
     project-id: ${GCP_PROJECT_ID}
@@ -60,7 +92,6 @@ langchain4j:
       model-name: gemini-2.5-flash
     embedding-model:
       model-name: text-embedding-004
-
     vector-store:
       pgvector:
         host: pgvector
@@ -71,6 +102,19 @@ langchain4j:
         table-name: vector_store
         dimension: 768
 
+# ============================================
+# CUSTOM RABBITMQ (Nomes de filas/exchanges)
+# ============================================
+rabbitmq:
+  queue:
+    pdf-processing: pdf-processing-queue
+    pdf-processing-dlq: pdf-processing-dlq
+  exchange:
+    pdf-processing: pdf-processing-exchange
+
+# ============================================
+# PROPRIEDADES CUSTOMIZADAS DA APLICAÇÃO
+# ============================================
 application:
   storage:
     bucket-name: ${MINIO_BUCKET_NAME}
@@ -78,8 +122,3 @@ application:
     jwt:
       secret-key: ${JWT_SECRET_KEY}
       expiration-hours: 8
-
-jwt:
-  secret: ${JWT_SECRET_KEY}
-  expiration-hours: 8
-  refresh-token-expiration-hours: 24

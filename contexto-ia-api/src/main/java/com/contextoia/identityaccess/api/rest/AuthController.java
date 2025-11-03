@@ -8,36 +8,43 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.contextoia.identityaccess.api.dto.AuthRequest;
-import com.contextoia.identityaccess.api.dto.AuthResponse;
 import com.contextoia.identityaccess.api.dto.UserDTO;
 import com.contextoia.identityaccess.application.dto.CreateUserDTO;
 import com.contextoia.identityaccess.application.service.AuthService;
 
-/**
- * Controller REST para os endpoints públicos de autenticação (Login e
- * Registro).
- */
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+
+
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 public class AuthController {
+    private final AuthService authService;
 
-  private final AuthService authService;
+    public AuthController(AuthService authService) {
+        this.authService = authService;
+    }
 
-  public AuthController(AuthService authService) {
-    this.authService = authService;
-  }
+    @PostMapping("/login")
+    public ResponseEntity<Void> login(@RequestBody AuthRequest request, HttpServletResponse response) {
+        String token = authService.authenticate(request.username(), request.rawPassword());
 
-  @PostMapping("/login")
-  public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
-    String token = authService.authenticate(request.username(), request.rawPassword());
-    return ResponseEntity.ok(new AuthResponse(token));
-  }
+        Cookie jwtCookie = new Cookie("jwt-token", token);
+        jwtCookie.setHttpOnly(true);
+       // jwtCookie.setSecure(true); // Defina como 'true' em produção (requer HTTPS)
+        jwtCookie.setPath("/");
+        jwtCookie.setMaxAge(24 * 60 * 60); // Expira em 1 dia
 
-  @PostMapping("/register")
-  public ResponseEntity<UserDTO> register(@RequestBody CreateUserDTO request) {
-    UserDTO user = authService.register(request);
-    return ResponseEntity
-        .status(HttpStatus.CREATED)
-        .body(user);
-  }
+        response.addCookie(jwtCookie);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<UserDTO> register(@RequestBody CreateUserDTO request) {
+        return new ResponseEntity<>(authService.register(request), HttpStatus.CREATED);
+    }
+
 }
+
+

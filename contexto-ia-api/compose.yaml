@@ -44,6 +44,16 @@ services:
     networks:
       - contexto-ia-network
 
+  minio:
+    image: minio/minio:latest
+    ports:
+      - 9000:9000
+      - 9001:9001
+    env_file:
+      - ./.env
+    networks:
+      - contexto-ia-network
+
 volumes:
   postgres-data:
   rabbitmq-data:
