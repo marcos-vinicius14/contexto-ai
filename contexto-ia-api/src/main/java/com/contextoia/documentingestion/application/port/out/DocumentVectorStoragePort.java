@@ -6,5 +6,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface DocumentVectorStoragePort {
-    List<Document> findSimilarDocuments(float[] embedding, UUID userId, int limit);
+    List<Document> findSimilarDocuments(Float[] embedding, UUID userId, int limit);
 }

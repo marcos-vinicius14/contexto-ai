@@ -11,6 +11,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.UUID;
 
 @Service
@@ -31,13 +32,13 @@ public class UploadDocumentService implements UploadDocumentUseCase {
 
     @Override
     @Transactional
-    public DocumentUploadResponse execute(MultipartFile file, UUID userId) {
+    public DocumentUploadResponse execute(MultipartFile file, UUID userId) throws IOException {
         validateFile(file);
 
         Document document = createDocument(file, userId);
 
         String storageKey = storagePort.store(file, document.getFileName());
-        document.setStorageKey(storageKey);
+        document = document.withStorageKey(storageKey);
 
         Document savedDocument = documentRepository.save(document);
 
@@ -80,13 +81,13 @@ public class UploadDocumentService implements UploadDocumentUseCase {
     }
 
     private Document createDocument(MultipartFile file, UUID userId) {
-        Document document = new Document();
-        document.setOriginalFileName(sanitizeFileName(file.getOriginalFilename()));
-        document.setFileName(storagePort.generateFileName(file.getOriginalFilename()));
-        document.setContentType(file.getContentType());
-        document.setFileSize(file.getSize());
-        document.assignToUser(userId);
-        return document;
+        return Document.builder()
+                .originalFileName(sanitizeFileName(file.getOriginalFilename()))
+                .fileName(storagePort.generateFileName(file.getOriginalFilename()))
+                .contentType(file.getContentType())
+                .fileSize(file.getSize())
+                .userId(userId)
+                .build();
     }
 
     private String sanitizeFileName(String fileName) {

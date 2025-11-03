@@ -11,6 +11,10 @@ import org.hibernate.annotations.UuidGenerator;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Represents a Document entity, mapped to the table "tb_documents".
+ * Used for storing metadata of documents processed by the application.
+ */
 @Entity
 @Table(name = "tb_documents")
 public class Document {
@@ -61,7 +65,20 @@ public class Document {
     @Column(name = "extracted_text", columnDefinition = "TEXT")
     private String extractedText;
 
-    public Document() {}
+    protected Document() {}
+
+    private Document(Builder builder) {
+        this.fileName = builder.fileName;
+        this.originalFileName = builder.originalFileName;
+        this.storageKey = builder.storageKey;
+        this.fileSize = builder.fileSize;
+        this.contentType = builder.contentType;
+        this.extractedText = builder.extractedText;
+        this.embedding = builder.embedding;
+        this.userId = builder.userId;
+        this.status = builder.status != null ? builder.status : DocumentStatus.PENDING;
+        this.errorMessage = builder.errorMessage;
+    }
 
     @PrePersist
     @PreUpdate
@@ -145,4 +162,118 @@ public class Document {
     public boolean isCompleted() { return this.status == DocumentStatus.COMPLETED; }
     public boolean isFailed() { return this.status == DocumentStatus.FAILED; }
     public boolean canBeProcessed() { return isPending(); }
+
+
+    public Document withStorageKey(String storageKey) {
+        return Document.builder()
+                .from(this)
+                .storageKey(storageKey)
+                .build();
+    }
+
+    public Document withExtractedText(String extractedText) {
+        if (!isProcessing()) {
+            throw new IllegalStateException("Texto só pode ser atualizado durante processamento");
+        }
+        return Document.builder()
+                .from(this)
+                .extractedText(extractedText)
+                .build();
+    }
+
+    public Document withEmbedding(PGvector embedding) {
+        if (!isProcessing()) {
+            throw new IllegalStateException("Embedding só pode ser atualizado durante processamento");
+        }
+        return Document.builder()
+                .from(this)
+                .embedding(embedding)
+                .build();
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private String fileName;
+        private String originalFileName;
+        private String storageKey;
+        private Long fileSize;
+        private String contentType;
+        private String extractedText;
+        private PGvector embedding;
+        private UUID userId;
+        private DocumentStatus status;
+        private String errorMessage;
+
+        public Builder fileName(String fileName) {
+            this.fileName = fileName;
+            return this;
+        }
+
+        public Builder originalFileName(String originalFileName) {
+            this.originalFileName = originalFileName;
+            return this;
+        }
+
+        public Builder storageKey(String storageKey) {
+            this.storageKey = storageKey;
+            return this;
+        }
+
+        public Builder fileSize(Long fileSize) {
+            this.fileSize = fileSize;
+            return this;
+        }
+
+        public Builder contentType(String contentType) {
+            this.contentType = contentType;
+            return this;
+        }
+
+        public Builder extractedText(String extractedText) {
+            this.extractedText = extractedText;
+            return this;
+        }
+
+        public Builder embedding(PGvector embedding) {
+            this.embedding = embedding;
+            return this;
+        }
+
+        public Builder userId(UUID userId) {
+            this.userId = userId;
+            return this;
+        }
+
+        public Builder status(DocumentStatus status) {
+            this.status = status;
+            return this;
+        }
+
+        public Builder errorMessage(String errorMessage) {
+            this.errorMessage = errorMessage;
+            return this;
+        }
+
+        // Método para copiar de um documento existente
+        public Builder from(Document document) {
+            this.fileName = document.fileName;
+            this.originalFileName = document.originalFileName;
+            this.storageKey = document.storageKey;
+            this.fileSize = document.fileSize;
+            this.contentType = document.contentType;
+            this.extractedText = document.extractedText;
+            this.embedding = document.embedding;
+            this.userId = document.userId;
+            this.status = document.status;
+            this.errorMessage = document.errorMessage;
+            return this;
+        }
+
+        public Document build() {
+            return new Document(this);
+        }
+    }
 }

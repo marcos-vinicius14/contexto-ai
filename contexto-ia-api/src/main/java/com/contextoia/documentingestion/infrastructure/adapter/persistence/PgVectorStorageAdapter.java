@@ -36,7 +36,7 @@ public class PgVectorStorageAdapter implements DocumentVectorStoragePort {
      * @return a list of documents that are most similar to the given embedding vector, sorted by similarity
      */
     @Override
-    public List<Document> findSimilarDocuments(float[] embedding, UUID userId, int limit) {
+    public List<Document> findSimilarDocuments(Float[] embedding, UUID userId, int limit) {
         String embeddingStr = formatFloatArrayAsVectorString(embedding);
         return pgVectorRepository.findSimilarDocuments(embeddingStr, userId, limit);
     }
@@ -50,7 +50,7 @@ public class PgVectorStorageAdapter implements DocumentVectorStoragePort {
      * @param array a float array to be converted into a vector string format
      * @return a string representation of the array in vector format, with elements separated by a delimiter
      */
-    private String formatFloatArrayAsVectorString(float[] array) {
+    private String formatFloatArrayAsVectorString(Float[] array) {
         StringBuilder sb = new StringBuilder("[");
         for (int i = 0; i < array.length; i++) {
             if (i > 0) sb.append(VECTOR_DELIMITER);

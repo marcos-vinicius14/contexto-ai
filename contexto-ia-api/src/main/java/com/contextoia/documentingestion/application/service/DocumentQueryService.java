@@ -58,7 +58,7 @@ public class DocumentQueryService implements
 
     @Override
     public List<SimilarDocumentResponse> execute(SearchSimilarRequest request, UUID userId) {
-        float[] queryEmbedding = embeddingPort.generateEmbedding(request.query());
+        Float[] queryEmbedding = embeddingPort.generateEmbedding(request.query());
         List<Document> similarDocs = vectorStorage.findSimilarDocuments(
                 queryEmbedding,
                 userId,
